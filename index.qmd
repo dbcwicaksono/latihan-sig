@@ -1,26 +1,41 @@
 ---
 title: "Latihan R"
 format: html
-editor: visual
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
+```{r, echo=FALSE}
+library(sf)
+library(readr)
+library(leaflet)
 ```
 
-You can add options to executable code like this
+## Peta Jatim
 
 ```{r}
-#| echo: false
-2 * 2
+jatim <- st_read("./peta/jatim.shp") %>% 
+  st_transform(crs = 4326)
+
+# runif(jumlah_data, min, maks)
+jatim$dataacak <- runif(nrow(jatim), 1, 10)
+
+# set plot leaflet
+pal <- colorBin(
+  palette = "RdYlBu", 
+  domain = jatim$dataacak, 
+  bins = 5
+)
+
+leaflet(jatim) %>% 
+  addTiles() %>% 
+  addPolygons(fillColor = ~pal(dataacak), 
+              color = "black", weight = 1,
+              fillOpacity = 0.8,
+              label = ~dataacak)
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+```{r}
+datax <- read.csv("data.csv") %>% 
+  st_as_sf(coords = c("lng", "lat"), crs = 4326)
+```
+
+
